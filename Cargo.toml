@@ -1,0 +1,10 @@
+[package]
+name = "festum"
+version = "0.1.0"
+authors = ["Hiromitsu Oshiba <h.oshiba@strelka.cc>"]
+edition = "2018"
+
+[dependencies]
+reqwest="0.9"
+failure="0.1"
+serde={version="1.0", features=["derive"]}
