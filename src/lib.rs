@@ -28,6 +28,12 @@ struct AlienVaultBaseIndicator {
 }
 
 #[derive(Deserialize)]
+struct MalshareResult {
+    #[serde(rename="SHA256")]
+    sha256: Option<String>,
+}
+
+#[derive(Deserialize)]
 struct AlienVaultResponse {
     base_indicator: Option<AlienVaultBaseIndicator>,
 }
@@ -85,11 +91,13 @@ impl Client {
     }
 
     pub fn query_malshare(&self, hash: impl AsRef<str>) -> GenericResult<bool> {
+
         let apikey = self
             .malshare
             .as_ref()
             .ok_or(failure::err_msg("MalShare API key not set"))?;
-        let res: String = reqwest::get(
+
+        let res: MalshareResult = reqwest::get(
             format!(
                 "https://malshare.com/api.php?api_key={}&action=details&hash={}",
                 apikey.as_str(),
@@ -97,8 +105,9 @@ impl Client {
             )
             .as_str(),
         )?
-        .text()?;
-        Ok(!res.contains("Sample not found by hash"))
+        .json()?;
+
+        Ok(res.sha256.is_some())
     }
 
     pub fn query_reverseit(&self, hash: impl AsRef<str>) -> GenericResult<bool> {
